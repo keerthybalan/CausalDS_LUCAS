@@ -1,3 +1,6 @@
 tmp/
 obs_data*
 causal_model.png
+effect*
+__pycache__/
+*.gml
