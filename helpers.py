@@ -14,7 +14,7 @@ def gml_to_string(file):
 def get_backdoor_paths(G, N1, N2):
     """Takes a NetworkX directed graph G, and gives the backdoors between node N1 and node N2."""
     # creating a copy of our graph G that is undirected
-    H = G.to_undirected()
+    H = G.copy().to_undirected()
     all_possible_paths = [x for x in nx.all_simple_paths(H, N1, N2)]
     graph_nodes = backdoor.Backdoor(G, N1, N2)
 
@@ -28,6 +28,7 @@ def get_backdoor_paths(G, N1, N2):
 def get_adjustment_variables(G, paths):
     """Takes a NetworkX directed graph G and a list of paths and gives the corresponding adjustment variables."""
     # finally, we add the information to our dataframe, with the path, colliders, and non-colliders
+    _G = G.copy()
     adjustment_variables = pd.DataFrame(columns=['path', 'colliders_desc', 'non_colliders'])
 
     for path in paths:
@@ -40,8 +41,8 @@ def get_adjustment_variables(G, paths):
         # we loop through adjacent variables on the path, ignoring the source and target variables as potential colliders
         for node0, node1, node2 in zip(path[0:path_len-2], path[1:path_len-1], path[2:]):
             # if there is an arrow pointing into node1 from both sides on the path, it is a collider
-            if G.has_edge(node0, node1) and G.has_edge(node2, node1):
-                colliders_desc = np.append(colliders_desc, list(nx.descendants(G,node1)) + [node1]) # so we add it (and all its descendants) to the list
+            if _G.has_edge(node0, node1) and _G.has_edge(node2, node1):
+                colliders_desc = np.append(colliders_desc, list(nx.descendants(_G,node1)) + [node1]) # so we add it (and all its descendants) to the list
         # we flatten the list of list
         colliders_desc = colliders_desc.flatten()
                 
